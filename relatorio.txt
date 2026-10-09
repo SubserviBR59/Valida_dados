@@ -1,0 +1,23 @@
+RELATÓRIO DE ANÁLISE DE DADOS — SPRINT 5
+============================================================
+Validação didática: CPF e telefone são verificados por formato.
+Total de registros: 6
+Registros válidos: 3
+Registros inválidos: 3
+Percentual de aprovação: 50.00%
+
+DADOS VÁLIDOS
+Registro 1: email='ana@example.com' | cpf='000.000.000-00' | telefone='(11) 90000-0000' | data='29/02/2024' | idade='28'
+Registro 2: email='bruno@example.org' | cpf='11111111111' | telefone='21900000000' | data='15/08/2025' | idade='35'
+Registro 6: email='fabio@example.net' | cpf='44444444444' | telefone='(31)90000-0000' | data='01/12/2025' | idade='0'
+
+DADOS INVÁLIDOS
+Registro 3: email='carla.example.com' | cpf='123' | telefone='(11) 90000-0000' | data='31/02/2025' | idade='abc'
+  - email: formato ou valor inválido
+  - cpf: formato ou valor inválido
+  - data: formato ou valor inválido
+  - idade: informe um número inteiro
+Registro 4: email='davi@example.com' | cpf='222.222.222-22' | telefone='11900000000' | data='10/10/2025' | idade='150'
+  - idade: idade fora da faixa de 0 a 120 anos
+Registro 5: email='elisa@example.com' | cpf='333.333.333-33' | telefone='123' | data='01/01/2025' | idade='22'
+  - telefone: formato ou valor inválido
