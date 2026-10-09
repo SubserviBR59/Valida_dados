@@ -1,86 +1,154 @@
-Sistema de Análise de Dados — Sprint 5
-Projeto didático em Python para ler um CSV, validar campos com expressões
-regulares, tratar exceções e salvar um relatório de registros válidos e inválidos.
-Requisitos e execução
-Python 3.9 ou superior. Usa somente a biblioteca padrão; não é necessário pip install.
-No terminal, dentro da pasta do projeto:
+# ValidaDados
+
+Sistema de análise e validação de dados desenvolvido em Python para o **Desafio Sprint 5 — Semana 05**.
+
+O programa lê um arquivo CSV, verifica as informações de cada registro e gera um relatório com os dados válidos, inválidos e as estatísticas da análise.
+
+## Funcionalidades
+
+- Leitura de arquivos CSV com codificação UTF-8.
+- Validação de e-mail, CPF, telefone e data com expressões regulares.
+- Validação da idade com regra de negócio.
+- Tratamento de erros de leitura, conversão e gravação.
+- Relatório formatado com f-strings.
+- Testes automatizados.
+
+## Tecnologias
+
+- Python 3.9 ou superior.
+- Bibliotecas padrão: `csv`, `re`, `datetime`, `pathlib` e `argparse`.
+- Testes com `unittest`.
+
+Não é necessário instalar bibliotecas externas.
+
+## Estrutura do projeto
+
+| Arquivo | Descrição |
+| --- | --- |
+| `main.py` | Programa principal |
+| `dados/exemplo.csv` | Dados fictícios para análise |
+| `relatorios/relatorio.txt` | Relatório gerado pelo programa |
+| `test_main.py` | Testes automatizados |
+| `README.md` | Documentação do projeto |
+
+## Como executar
+
+1. Baixe ou clone o repositório.
+2. Abra o terminal na pasta do projeto.
+3. Execute:
+
+```bash
 python main.py
-O comando usa dados/exemplo.csv e salva relatorios/relatorio.txt.
-Para outros arquivos:
+```
+
+O programa lê `dados/exemplo.csv` e salva o resultado em `relatorios/relatorio.txt`.
+
+Para informar outros caminhos:
+
+```bash
 python main.py dados/exemplo.csv --saida relatorios/outro_relatorio.txt
-Use python3 se esse for o comando disponível no seu computador. As pastas de
-saída devem existir. Um relatório existente será substituído; a entrada nunca pode
-ser usada como saída. O processamento mantém os registros em memória.
-Arquivos
-Arquivo	Finalidade
-main.py	Leitura, funções regex, exceções, análise e escrita do relatório
-dados/exemplo.csv	Seis registros inteiramente fictícios
-relatorios/relatorio.txt	Saída real gerada pelo exemplo
-test_main.py	Quinze testes automatizados
-.gitignore	Exclui cache Python e ambientes virtuais do versionamento
+```
 
+A pasta de saída deve existir. Se o arquivo de relatório já existir, seu conteúdo será substituído.
 
-Formato de entrada
-CSV em UTF-8, sem BOM, separado por vírgula, com os nomes de colunas exatamente
-como abaixo. A ordem das colunas pode variar. data é uma data genérica de
-registro; não representa nascimento e não é comparada com a idade.
+Em sistemas que utilizam esse comando, substitua `python` por `python3`.
+
+## Arquivo de entrada
+
+O CSV deve utilizar codificação **UTF-8**, separador **vírgula** e as seguintes colunas obrigatórias:
+
+```csv
 email,cpf,telefone,data,idade
 ana@example.com,000.000.000-00,(11) 90000-0000,29/02/2024,28
 bruno@example.org,11111111111,21900000000,15/08/2025,35
 carla.example.com,123,(11) 90000-0000,31/02/2025,abc
-Espaços no início e fim dos valores são removidos. Colunas adicionais nomeadas
-são ignoradas. Linhas curtas são analisadas como campos vazios; campos extras
-sem cabeçalho tornam o registro inválido. Linhas totalmente vazias são ignoradas
-pelo leitor CSV. A numeração no relatório conta registros, não linhas físicas.
-Arquivo com apenas cabeçalho gera relatório com zero registros; arquivo sem
-cabeçalho gera erro.
-Validações e justificativas
-Campo	Regra	Motivo e limite
-E-mail	Usuário, @ e domínio com sufixo alfabético de ao menos duas letras	Regra didática simplificada; não cobre todos os e-mails permitidos pelos padrões da internet nem verifica existência
-CPF	Onze dígitos ou máscara 000.000.000-00	Valida exclusivamente formato; não calcula dígitos verificadores nem consulta cadastro
-Telefone	DDD de dois dígitos, iniciado de 1 a 9; número de oito ou nove dígitos, iniciado de 2 a 9	Aceita (11) 90000-0000, (11)90000-0000 e 11900000000; não verifica DDD real, operadora ou existência; não aceita +55
-Data	DD/MM/AAAA e data existente no calendário	Regex confere a máscara; datetime.strptime() rejeita datas como 31/02/2025 e considera anos bissextos
-Idade	Conversível em inteiro e entre 0 e 120, inclusive	Conversão demonstra ValueError; faixa demonstra a exceção personalizada
+davi@example.com,222.222.222-22,11900000000,10/10/2025,150
+elisa@example.com,333.333.333-33,123,01/01/2025,22
+fabio@example.net,44444444444,(31)90000-0000,01/12/2025,0
+```
 
+Todos os dados do exemplo são fictícios. Os registros inválidos foram incluídos propositalmente para demonstrar as validações.
 
-Os CPFs repetidos do exemplo são propositalmente artificiais. Um registro
-classificado como válido atende às regras acima, não significa identidade real.
-Expressões regulares
-Os padrões usam raw strings, como:
-r"^(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$"  # CPF
-r"^\d{2}/\d{2}/\d{4}$"  # Data
-- ^ e $: limites do texto; fullmatch() exige correspondência completa.
-- \d: dígito; \w: caractere de palavra; \s: espaço em branco.
-- \.: ponto literal; {n}: quantidade exata; {m,n}: faixa de repetições.
-- ?: trecho opcional; |: alternativa; (?:...): agrupamento sem captura.
-- re.ASCII restringe \d e \w ao alfabeto ASCII nos padrões aplicáveis.
-A validação é feita com o motor re do próprio Python, coberto pelos testes.
-Não foi utilizada uma ferramenta online de regex.
-Exceções tratadas
-Exceção	Quando ocorre	Comportamento
-FileNotFoundError	CSV não existe	Mensagem clara; não cria relatório
-KeyError	Coluna obrigatória ou cabeçalho ausente	Interrompe a análise, informando o problema
-ValueError	Idade não inteira	Marca o registro como inválido e continua
-ValueError	Data impossível	Função retorna False; registro fica inválido
-ValueError	Cabeçalho duplicado ou entrada igual à saída	Interrompe sem sobrescrever a entrada
-IdadeInvalidaError	Idade menor que 0 ou maior que 120	Marca o registro como inválido e continua
-UnicodeError	Arquivo não decodificável em UTF-8	Informa a codificação exigida
-csv.Error	CSV estruturalmente malformado	Interrompe sem gerar relatório parcial
-OSError	Falta de permissão, pasta ausente ou falha de escrita	Informa o erro de acesso ou gravação
+## Regras de validação
 
+| Campo | Regra aplicada |
+| --- | --- |
+| E-mail | Formato simplificado com usuário, `@` e domínio |
+| CPF | Onze dígitos, com ou sem a máscara `000.000.000-00` |
+| Telefone | DDD e número de oito ou nove dígitos, nos formatos aceitos |
+| Data | Formato `DD/MM/AAAA` e existência da data no calendário |
+| Idade | Número inteiro entre 0 e 120 anos |
 
-IdadeInvalidaError herda diretamente de Exception. O programa demonstra
-try/except/else/finally: try tenta ler e analisar; except trata a falha;
-else gera o relatório quando a análise termina; finally informa o término
-nos caminhos de sucesso e erro tratados. A escrita no else tem seu próprio
-try, pois erros dentro de else não são capturados pelos except anteriores.
-O fechamento automático dos arquivos é responsabilidade de with open().
-O código de saída é 0 quando a análise e a gravação terminam e 1 em falhas
-tratadas de arquivo/configuração. Ter registros inválidos não é falha de execução:
-eles são parte do resultado esperado da análise. Erros de argumentos da linha de
-comando são tratados pelo argparse, antes do processamento.
-Exemplo de saída
-O CSV completo fornecido tem seis registros. A saída começa assim:
+### Expressões regulares
+
+Os padrões são definidos com raw strings e verificados com o módulo `re`.
+
+Exemplo de padrão para CPF:
+
+```python
+r"^(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$"
+```
+
+Exemplo de padrão para data:
+
+```python
+r"^\d{2}/\d{2}/\d{4}$"
+```
+
+São utilizados recursos como:
+
+- `^` e `$`: delimitam o início e o fim do texto.
+- `\d`: representa dígitos.
+- `\w`: representa caracteres de palavra.
+- `\s`: representa espaços em branco.
+- `{n}`: define a quantidade de repetições.
+- `|`: permite alternativas de formato.
+
+A função `fullmatch()` exige que todo o campo corresponda ao padrão.
+
+### Limites das validações
+
+O CPF é validado somente pelo formato, sem cálculo dos dígitos verificadores ou consulta cadastral.
+
+E-mail e telefone não são consultados em serviços externos. Portanto, um formato válido não comprova que esses contatos existem.
+
+A data também é verificada com `datetime.strptime()`, permitindo rejeitar valores como `31/02/2025`.
+
+## Tratamento de exceções
+
+| Exceção | Situação tratada |
+| --- | --- |
+| `FileNotFoundError` | Arquivo de entrada inexistente |
+| `KeyError` | Coluna obrigatória ou cabeçalho ausente |
+| `ValueError` | Conversão inválida da idade ou configuração inconsistente |
+| `IdadeInvalidaError` | Idade fora da faixa permitida |
+| `UnicodeError` | Codificação incompatível com UTF-8 |
+| `csv.Error` | Estrutura inválida do CSV |
+| `OSError` | Falha de acesso ou gravação |
+
+A exceção personalizada herda de `Exception`:
+
+```python
+class IdadeInvalidaError(Exception):
+    """Idade fora da faixa permitida."""
+```
+
+O programa utiliza:
+
+- `try`: executa operações que podem falhar.
+- `except`: trata as exceções previstas.
+- `else`: executa quando o bloco `try` termina sem exceções.
+- `finally`: informa o encerramento do processamento.
+
+Os arquivos são abertos com `with open()`, garantindo seu fechamento automático.
+
+Erros em campos tornam o registro inválido, mas permitem analisar os demais. Falhas na leitura ou no cabeçalho interrompem a análise com uma mensagem explicativa.
+
+## Relatório de saída
+
+Para o CSV completo de exemplo, o resumo gerado é:
+
+```text
 RELATÓRIO DE ANÁLISE DE DADOS — SPRINT 5
 ============================================================
 Validação didática: CPF e telefone são verificados por formato.
@@ -88,16 +156,28 @@ Total de registros: 6
 Registros válidos: 3
 Registros inválidos: 3
 Percentual de aprovação: 50.00%
-A seguir são listados todos os dados válidos e inválidos, com cada motivo de
-reprovação. O registro 3 possui erros de e-mail, CPF, data e conversão da idade;
-o registro 4 tem idade fora da faixa; o registro 5 tem telefone inválido.
-Consulte relatorios/relatorio.txt para a saída integral. O relatório utiliza
-f-strings, inclusive para formatar o percentual com duas casas decimais.
-Testes
-Dentro da pasta do projeto:
+```
+
+O relatório também apresenta:
+
+- Os campos de cada registro válido.
+- Os campos de cada registro inválido.
+- Os motivos de reprovação de cada registro.
+
+A saída é exibida no terminal e gravada em um arquivo TXT.
+
+## Testes automatizados
+
+Execute na pasta do projeto:
+
+```bash
 python -m unittest -v
-Quinze testes verificam máscaras, datas impossíveis, ano bissexto, limites da
-idade, exceções, arquivo ausente, coluna ausente, cabeçalho duplicado, CSV vazio,
-linhas incompletas, campos extras, UTF-8 inválido, CSV malformado, relatório,
-falha de saída e proteção contra sobrescrever a entrada. Todos passaram na
-verificação da entrega.
+```
+
+O projeto contém 15 testes que verificam as validações, as exceções, a leitura dos dados e a geração do relatório.
+
+Entre os cenários estão arquivo inexistente, coluna ausente, data impossível, idade inválida, CSV malformado e proteção contra sobrescrever o arquivo de entrada.
+
+## Objetivo acadêmico
+
+Aplicar os conceitos de manipulação de arquivos, expressões regulares e tratamento de exceções em um sistema de análise de dados, com código organizado, nomes descritivos e documentação de uso.
